@@ -130,8 +130,7 @@ jobs:
 
           gh secret set HYTALE_CREDENTIALS \
             --env prod \
-            --repo "$GITHUB_REPOSITORY" \
-            --body-file .hytale-credentials.json
+              --repo "$GITHUB_REPOSITORY" < .hytale-credentials.json
 
       - name: Check if build is needed
         id: check
@@ -268,8 +267,7 @@ jobs:
 
           gh secret set HYTALE_CREDENTIALS \
             --env prod \
-            --repo "$GITHUB_REPOSITORY" \
-            --body-file .hytale-credentials.json
+              --repo "$GITHUB_REPOSITORY" < .hytale-credentials.json
 
       # -----------------------------------------------------------------------
       # Authentication
