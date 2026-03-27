@@ -12,18 +12,12 @@ Official Docker images for EverHytale projects.
 
 ## 🏷️ Tag Strategy
 
-All images use SemVer with Hytale version as build metadata:
+All images now use only the Hytale downloader version and `latest`:
 
 | Tag | Description | Example |
 |-----|-------------|---------|
-| `latest` | Latest stable release | `ghcr.io/ivanjx/hytale-server:latest` |
-| `X.Y.Z+HYTALE_VERSION` | Full version (image + Hytale) | `ghcr.io/ivanjx/hytale-server:1.0.0+2026.01.15-c04fdfe10` |
-| `HYTALE_VERSION` | Latest image for this Hytale version | `ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10` |
-| `X.Y` | Minor version (latest patch) | `ghcr.io/ivanjx/hytale-server:1.0` |
-| `X` | Major version (latest minor) | `ghcr.io/ivanjx/hytale-server:1` |
-| `rc` | Latest release candidate | `ghcr.io/ivanjx/hytale-server:rc` |
-| `dev` | Latest development build | `ghcr.io/ivanjx/hytale-server:dev` |
-| `edge` | Latest build from main branch | `ghcr.io/ivanjx/hytale-server:edge` |
+| `latest` | Latest available built image | `ghcr.io/ivanjx/hytale-server:latest` |
+| `HYTALE_VERSION` | Hytale version from downloader | `ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10` |
 
 ### Automated Builds
 

@@ -7,15 +7,13 @@
 # Registry Strategy:
 #   - GHCR: all builds (edge, dev, rc, releases)
 #
-# Tag Strategy (SemVer with Hytale version):
-#   - v1.0.0          → GHCR: 1.0.0_{HYTALE_VERSION}, {HYTALE_VERSION}, latest, major, major.minor
-#   - v1.0.0-rc.1     → GHCR only: 1.0.0-rc.1_{HYTALE_VERSION}, rc
-#   - v1.0.0-dev.1    → GHCR only: 1.0.0-dev.1_{HYTALE_VERSION}, dev
-#   - main branch     → GHCR only: edge_{HYTALE_VERSION}, edge
-#   - schedule        → auto-build on new Hytale version (every 12h check)
+# Tag Strategy:
+#   - On push/main/master/schedule: build from latest Hytale downloader version
+#   - GHCR: push tags `latest` and `<HYTALE_VERSION>` only
+#   - No Git tag-derived version tags (semver/rc/dev/edge) are created
 #
-# Example tags for release v1.0.0 with Hytale version 2026.01.15-c04fdfe10:
-#   GHCR: ghcr.io/ivanjx/hytale-server:1.0.0_2026.01.15-c04fdfe10, :latest, :1, :1.0
+# Example tags for Hytale version 2026.01.15-c04fdfe10:
+#   GHCR: ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10, ghcr.io/ivanjx/hytale-server:latest
 # =============================================================================
 
 name: Hytale Server - Build & Push GHCR
@@ -29,8 +27,6 @@ on:
     branches:
       - main
       - master
-    tags:
-      - 'v*'
     paths:
       - 'dockers/hytale-server/**'
       - '.github/workflows/hytale-server.yml'
@@ -149,19 +145,15 @@ jobs:
           fi
 
           # Always build for:
-          # - Tag pushes (release)
-          # - Push to main with path changes
+          # - Push to main/master with path changes
           # - Force rebuild
-          # - New Hytale version detected (tag doesn't exist)
+          # - New Hytale version detected
           # - Pull requests (for testing)
 
           # Export tag_exists for all cases
           echo "tag_exists=$TAG_EXISTS" >> $GITHUB_OUTPUT
 
-          if [[ "$EVENT_NAME" == "push" && "$GITHUB_REF" == refs/tags/* ]]; then
-            echo "should_build=true" >> $GITHUB_OUTPUT
-            echo "Build needed: tag push"
-          elif [[ "$EVENT_NAME" == "push" ]]; then
+          if [[ "$EVENT_NAME" == "push" ]]; then
             echo "should_build=true" >> $GITHUB_OUTPUT
             echo "Build needed: push to branch with path changes"
           elif [[ "$EVENT_NAME" == "pull_request" ]]; then
@@ -281,89 +273,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # -----------------------------------------------------------------------
-      # Determine version type and generate tags
+      # Generate tags (latest + downloader Hytale version)
       # -----------------------------------------------------------------------
-      - name: Determine version type
-        id: version
-        run: |
-          REF="${GITHUB_REF}"
-          HYTALE_VERSION="${{ needs.check-version.outputs.hytale_version }}"
-
-          if [[ "$REF" == refs/tags/v* ]]; then
-            IMAGE_VERSION="${REF#refs/tags/v}"
-
-            if [[ "$IMAGE_VERSION" == *"-rc"* ]]; then
-              echo "type=rc" >> $GITHUB_OUTPUT
-            elif [[ "$IMAGE_VERSION" == *"-dev"* ]] || [[ "$IMAGE_VERSION" == *"-alpha"* ]] || [[ "$IMAGE_VERSION" == *"-beta"* ]]; then
-              echo "type=dev" >> $GITHUB_OUTPUT
-            else
-              echo "type=release" >> $GITHUB_OUTPUT
-            fi
-            echo "image_version=$IMAGE_VERSION" >> $GITHUB_OUTPUT
-          else
-            echo "type=edge" >> $GITHUB_OUTPUT
-            echo "image_version=edge" >> $GITHUB_OUTPUT
-          fi
-
-          echo "hytale_version=$HYTALE_VERSION" >> $GITHUB_OUTPUT
-
-          echo "Detected type: $(grep type $GITHUB_OUTPUT | tail -1 | cut -d= -f2)"
-          echo "Image version: $(grep image_version $GITHUB_OUTPUT | tail -1 | cut -d= -f2)"
-          echo "Hytale version: $HYTALE_VERSION"
-
       - name: Generate Docker tags
         id: tags
         run: |
           GHCR_IMAGE="${{ env.GHCR_IMAGE }}"
-          IMAGE_VERSION="${{ steps.version.outputs.image_version }}"
-          HYTALE_VERSION="${{ steps.version.outputs.hytale_version }}"
-          VERSION_TYPE="${{ steps.version.outputs.type }}"
+          HYTALE_VERSION="${{ needs.check-version.outputs.hytale_version }}"
 
-          # Build the full version tag: IMAGE_VERSION_HYTALE_VERSION
-          FULL_VERSION="${IMAGE_VERSION}_${HYTALE_VERSION}"
-
-          # GHCR publishes all supported tag variants.
-          if [[ "$VERSION_TYPE" == "release" ]]; then
-            TAGS="${GHCR_IMAGE}:${FULL_VERSION}"
-
-            # Hytale version tag (latest image for this Hytale version)
-            TAGS="${TAGS},${GHCR_IMAGE}:${HYTALE_VERSION}"
-
-            # Latest tag
-            TAGS="${TAGS},${GHCR_IMAGE}:latest"
-
-            # SemVer tags (major.minor, major)
-            MAJOR=$(echo "$IMAGE_VERSION" | cut -d. -f1)
-            MINOR=$(echo "$IMAGE_VERSION" | cut -d. -f2)
-            if [[ "$MAJOR" != "0" ]]; then
-              TAGS="${TAGS},${GHCR_IMAGE}:${MAJOR}"
-            fi
-            TAGS="${TAGS},${GHCR_IMAGE}:${MAJOR}.${MINOR}"
-          else
-            # Non-release: push to GHCR only
-            TAGS="${GHCR_IMAGE}:${FULL_VERSION}"
-
-            # RC tag
-            if [[ "$VERSION_TYPE" == "rc" ]]; then
-              TAGS="${TAGS},${GHCR_IMAGE}:rc"
-            fi
-
-            # Dev tag
-            if [[ "$VERSION_TYPE" == "dev" ]]; then
-              TAGS="${TAGS},${GHCR_IMAGE}:dev"
-            fi
-
-            # Edge tag
-            if [[ "$VERSION_TYPE" == "edge" ]]; then
-              TAGS="${TAGS},${GHCR_IMAGE}:edge"
-            fi
-
-            # PR tag (GHCR only)
-            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              PR_NUMBER="${{ github.event.pull_request.number }}"
-              TAGS="${TAGS},${GHCR_IMAGE}:pr-${PR_NUMBER}"
-            fi
-          fi
+          # Only publish latest and Hytale version tags
+          TAGS="${GHCR_IMAGE}:${HYTALE_VERSION},${GHCR_IMAGE}:latest"
 
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
           echo "Generated tags:"
@@ -384,8 +303,7 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
-            VERSION=${{ steps.version.outputs.image_version }}
-            HYTALE_VERSION=${{ steps.version.outputs.hytale_version }}
+            HYTALE_VERSION=${{ needs.check-version.outputs.hytale_version }}
           build-contexts: |
             game=./game-files
           cache-from: type=gha,scope=hytale-server
@@ -395,7 +313,7 @@ jobs:
           labels: |
             org.opencontainers.image.title=Hytale Dedicated Server
             org.opencontainers.image.description=Optimized Hytale dedicated server Docker image with Java 25
-            hytale.version=${{ steps.version.outputs.hytale_version }}
+            hytale.version=${{ needs.check-version.outputs.hytale_version }}
 
       # -----------------------------------------------------------------------
       # Summary
@@ -408,10 +326,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Version Type** | \`${{ steps.version.outputs.type }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Image Version** | \`${{ steps.version.outputs.image_version }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Hytale Version** | \`${{ steps.version.outputs.hytale_version }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Full Tag** | \`${{ steps.version.outputs.image_version }}_${{ steps.version.outputs.hytale_version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Hytale Version** | \`${{ needs.check-version.outputs.hytale_version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tag Set** | \`latest, ${{ needs.check-version.outputs.hytale_version }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| **Platforms** | linux/amd64, linux/arm64 |" >> $GITHUB_STEP_SUMMARY
           echo "| **Digest** | \`${{ steps.build.outputs.digest }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
@@ -433,63 +349,11 @@ jobs:
           echo "docker pull ${{ env.GHCR_IMAGE }}:latest" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "# Specific Hytale version (latest image)" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.GHCR_IMAGE }}:${{ steps.version.outputs.hytale_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.GHCR_IMAGE }}:${{ needs.check-version.outputs.hytale_version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "# Specific image + Hytale version" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.GHCR_IMAGE }}:${{ steps.version.outputs.image_version }}_${{ steps.version.outputs.hytale_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "# Latest" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.GHCR_IMAGE }}:latest" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-
-  # ===========================================================================
-  # Job 3: Security Scan (only for releases and RC)
-  # ===========================================================================
-  security-scan:
-    needs: [check-version, build]
-    runs-on: ubuntu-latest
-    if: |
-      needs.build.result == 'success' &&
-      github.event_name != 'pull_request' &&
-      (contains(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-    permissions:
-      contents: read
-      security-events: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Determine scan tag
-        id: scan-tag
-        run: |
-          REF="${GITHUB_REF}"
-          if [[ "$REF" == refs/tags/v* ]]; then
-            VERSION="${REF#refs/tags/v}"
-            if [[ "$VERSION" == *"-rc"* ]]; then
-              echo "tag=rc" >> $GITHUB_OUTPUT
-            elif [[ "$VERSION" == *"-dev"* ]]; then
-              echo "tag=dev" >> $GITHUB_OUTPUT
-            else
-              echo "tag=latest" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "tag=edge" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ env.GHCR_IMAGE }}:${{ steps.scan-tag.outputs.tag }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-          skip-files: 'opt/hytale-server/HytaleServer.jar,opt/hytale-server/Assets.zip'
-          scanners: 'vuln,secret'
-          timeout: '30m'
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v4
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
 
   # ===========================================================================
   # Job 4: Skip notification (for scheduled runs with no new version)
