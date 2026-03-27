@@ -1,7 +1,6 @@
 # 🎮 Hytale Dedicated Server - Docker Image
 
 [![Build](https://github.com/everhytale/dockers/actions/workflows/hytale-server.yml/badge.svg)](https://github.com/everhytale/dockers/actions/workflows/hytale-server.yml)
-[![Docker Pulls](https://img.shields.io/docker/pulls/everhytale/hytale-server)](https://hub.docker.com/r/everhytale/hytale-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An optimized, production-ready Docker image for running Hytale dedicated servers.
@@ -16,18 +15,20 @@ All images use SemVer with Hytale version as build metadata:
 
 | Tag | Description | Example |
 |-----|-------------|---------|
-| `latest` | Latest stable release | `everhytale/hytale-server:latest` |
-| `X.Y.Z+HYTALE_VERSION` | Full version (image + Hytale) | `1.0.0+2026.01.15-c04fdfe10` |
-| `HYTALE_VERSION` | Latest image for this Hytale version | `2026.01.15-c04fdfe10` |
-| `X.Y` | Minor version (latest patch) | `1.0` |
-| `X` | Major version (latest minor) | `1` |
-| `rc` | Latest release candidate | `rc` |
-| `dev` | Latest development build | `dev` |
-| `edge` | Latest build from main branch | `edge` |
+| `latest` | Latest stable release | `ghcr.io/everhytale/hytale-server:latest` |
+| `X.Y.Z+HYTALE_VERSION` | Full version (image + Hytale) | `ghcr.io/everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10` |
+| `HYTALE_VERSION` | Latest image for this Hytale version | `ghcr.io/everhytale/hytale-server:2026.01.15-c04fdfe10` |
+| `X.Y` | Minor version (latest patch) | `ghcr.io/everhytale/hytale-server:1.0` |
+| `X` | Major version (latest minor) | `ghcr.io/everhytale/hytale-server:1` |
+| `rc` | Latest release candidate | `ghcr.io/everhytale/hytale-server:rc` |
+| `dev` | Latest development build | `ghcr.io/everhytale/hytale-server:dev` |
+| `edge` | Latest build from main branch | `ghcr.io/everhytale/hytale-server:edge` |
 
 ### Automated Builds
 
 The CI/CD pipeline automatically checks for new Hytale versions **every 12 hours**. When a new version is detected, a new Docker image is built and pushed with the appropriate tags.
+
+The workflow now persists the downloader credentials file between non-PR runs by updating the `prod` environment secret after each downloader invocation. `HYTALE_CREDENTIALS` is the source of truth, and if you want CI to write refreshed tokens back automatically you also need a `HYTALE_CREDENTIALS_SYNC_TOKEN` secret with permission to update repository or environment Actions secrets.
 
 ## ✨ Features
 
@@ -52,13 +53,13 @@ The CI/CD pipeline automatically checks for new Hytale versions **every 12 hours
 
 ```bash
 # Latest stable release
-docker pull everhytale/hytale-server:latest
+docker pull ghcr.io/everhytale/hytale-server:latest
 
 # Specific Hytale version (latest image for that version)
-docker pull everhytale/hytale-server:2026.01.15-c04fdfe10
+docker pull ghcr.io/everhytale/hytale-server:2026.01.15-c04fdfe10
 
 # Specific image + Hytale version
-docker pull everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10
+docker pull ghcr.io/everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10
 
 # Create data directory
 mkdir -p ./data
@@ -71,7 +72,7 @@ docker run -d \
   -v /etc/machine-id:/etc/machine-id:ro \
   -e MIN_MEMORY=4G \
   -e MAX_MEMORY=8G \
-  everhytale/hytale-server:latest
+   ghcr.io/everhytale/hytale-server:latest
 ```
 
 ### Option 2: Using Docker Compose
@@ -295,7 +296,7 @@ HYTALE_VERSION=$(cat game-files/.version) docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-context game=./game-files \
   --build-arg HYTALE_VERSION=$HYTALE_VERSION \
-  -t everhytale/hytale-server:local \
+   -t ghcr.io/everhytale/hytale-server:local \
   --push .
 ```
 
@@ -307,7 +308,7 @@ The repository includes a GitHub Actions workflow that:
 
 1. **Checks for new Hytale versions every 12 hours**
 2. Builds multi-architecture images (amd64, arm64)
-3. Pushes to Docker Hub and GitHub Container Registry
+3. Pushes images to GitHub Container Registry
 4. Uses SemVer tags with Hytale version as build metadata
 5. Runs security scans with Trivy
 
@@ -324,8 +325,7 @@ For a release `v1.0.0` with Hytale version `2026.01.15-c04fdfe10`:
 | Secret | Description |
 |--------|-------------|
 | `HYTALE_CREDENTIALS` | **Required**. JSON credentials for the Hytale downloader |
-| `DOCKERHUB_USERNAME` | Optional. Docker Hub username |
-| `DOCKERHUB_TOKEN` | Optional. Docker Hub access token |
+| `HYTALE_CREDENTIALS_SYNC_TOKEN` | Optional. Token that can update the `prod` environment secret after refresh |
 
 ### Setting up Secrets
 
@@ -402,6 +402,6 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 
 ## 🔗 Links
 
-- **Docker Hub**: [everhytale/hytale-server](https://hub.docker.com/r/everhytale/hytale-server)
+- **GitHub Container Registry**: [ghcr.io/everhytale/hytale-server](https://github.com/orgs/EverHytale/packages/container/package/hytale-server)
 - **GitHub Repository**: [everhytale/dockers](https://github.com/everhytale/dockers)
 - **Issues**: [GitHub Issues](https://github.com/everhytale/dockers/issues)

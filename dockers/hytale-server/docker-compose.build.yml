@@ -1,6 +1,6 @@
 # =============================================================================
 # Hytale Dedicated Server - Docker Compose for Local Build
-# Repository: https://github.com/everhytale/dockers
+# Repository: https://github.com/ivanjx/dockers
 # =============================================================================
 # Use this file to build the image locally instead of using pre-built images.
 # =============================================================================
@@ -38,7 +38,7 @@ services:
         VERSION: ${VERSION:-local}
         HYTALE_VERSION: ${HYTALE_VERSION:-unknown}
 
-    image: everhytale/hytale-server:local
+    image: ivanjx/hytale-server:local
     container_name: hytale-server
     restart: unless-stopped
 

@@ -1,7 +1,7 @@
 # =============================================================================
 # Hytale Dedicated Server - Docker Image
-# Repository: https://github.com/everhytale/dockers
-# Image: everhytale/hytale-server (Docker Hub)
+# Repository: https://github.com/ivanjx/dockers
+# Image: ghcr.io/ivanjx/hytale-server (GHCR)
 # =============================================================================
 # Multi-architecture support: amd64, arm64
 # Protocol: QUIC/UDP on port 5520
@@ -22,10 +22,6 @@ FROM eclipse-temurin:25-jre-noble
 # =============================================================================
 LABEL org.opencontainers.image.title="Hytale Dedicated Server"
 LABEL org.opencontainers.image.description="Hytale dedicated server with Java 25"
-LABEL org.opencontainers.image.vendor="EverHytale"
-LABEL org.opencontainers.image.url="https://github.com/everhytale/dockers"
-LABEL org.opencontainers.image.source="https://github.com/everhytale/dockers"
-LABEL org.opencontainers.image.documentation="https://github.com/everhytale/dockers/tree/main/dockers/hytale-server"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Build arguments for versioning

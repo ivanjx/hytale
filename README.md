@@ -6,9 +6,9 @@ Official Docker images for EverHytale projects.
 
 ## 📦 Available Images
 
-| Image | Description | Docker Hub |
-|-------|-------------|------------|
-| [hytale-server](./dockers/hytale-server) | Optimized Hytale dedicated server | [![Docker Pulls](https://img.shields.io/docker/pulls/everhytale/hytale-server)](https://hub.docker.com/r/everhytale/hytale-server) |
+| Image | Description | Registry |
+|-------|-------------|----------|
+| [hytale-server](./dockers/hytale-server) | Optimized Hytale dedicated server | `ghcr.io/ivanjx/hytale-server` |
 
 ## 🏷️ Tag Strategy
 
@@ -16,14 +16,14 @@ All images use SemVer with Hytale version as build metadata:
 
 | Tag | Description | Example |
 |-----|-------------|---------|
-| `latest` | Latest stable release | `everhytale/hytale-server:latest` |
-| `X.Y.Z+HYTALE_VERSION` | Full version (image + Hytale) | `everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10` |
-| `HYTALE_VERSION` | Latest image for this Hytale version | `everhytale/hytale-server:2026.01.15-c04fdfe10` |
-| `X.Y` | Minor version (latest patch) | `everhytale/hytale-server:1.0` |
-| `X` | Major version (latest minor) | `everhytale/hytale-server:1` |
-| `rc` | Latest release candidate | `everhytale/hytale-server:rc` |
-| `dev` | Latest development build | `everhytale/hytale-server:dev` |
-| `edge` | Latest build from main branch | `everhytale/hytale-server:edge` |
+| `latest` | Latest stable release | `ghcr.io/ivanjx/hytale-server:latest` |
+| `X.Y.Z+HYTALE_VERSION` | Full version (image + Hytale) | `ghcr.io/ivanjx/hytale-server:1.0.0+2026.01.15-c04fdfe10` |
+| `HYTALE_VERSION` | Latest image for this Hytale version | `ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10` |
+| `X.Y` | Minor version (latest patch) | `ghcr.io/ivanjx/hytale-server:1.0` |
+| `X` | Major version (latest minor) | `ghcr.io/ivanjx/hytale-server:1` |
+| `rc` | Latest release candidate | `ghcr.io/ivanjx/hytale-server:rc` |
+| `dev` | Latest development build | `ghcr.io/ivanjx/hytale-server:dev` |
+| `edge` | Latest build from main branch | `ghcr.io/ivanjx/hytale-server:edge` |
 
 ### Automated Builds
 
@@ -35,20 +35,20 @@ The CI/CD pipeline automatically checks for new Hytale versions every 12 hours. 
 
 ```bash
 # Latest stable release
-docker pull everhytale/hytale-server:latest
+docker pull ghcr.io/ivanjx/hytale-server:latest
 
 # Specific Hytale version (latest image)
-docker pull everhytale/hytale-server:2026.01.15-c04fdfe10
+docker pull ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10
 
 # Specific image + Hytale version
-docker pull everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10
+docker pull ghcr.io/ivanjx/hytale-server:1.0.0+2026.01.15-c04fdfe10
 
 # Run the server
 docker run -d \
   --name hytale-server \
   -p 5520:5520/udp \
   -v hytale-data:/server \
-  everhytale/hytale-server:latest
+  ghcr.io/ivanjx/hytale-server:latest
 ```
 
 See [hytale-server documentation](./dockers/hytale-server/README.md) for detailed usage.
@@ -104,11 +104,6 @@ Contributions are welcome! Please read the [Contributing Guidelines](./CONTRIBUT
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🔗 Links
-
-- **GitHub**: [everhytale/dockers](https://github.com/everhytale/dockers)
-- **Docker Hub**: [everhytale](https://hub.docker.com/u/everhytale)
 
 ---
 

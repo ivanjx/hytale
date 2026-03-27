@@ -1,7 +1,7 @@
 # =============================================================================
 # Hytale Dedicated Server - Docker Compose Configuration
-# Repository: https://github.com/everhytale/dockers
-# Image: everhytale/hytale-server (Docker Hub)
+# Repository: https://github.com/ivanjx/dockers
+# Image: ghcr.io/ivanjx/hytale-server (GHCR)
 # =============================================================================
 # Directory structure:
 #   /opt/hytale-server/  - Game files (read-only, in image)
@@ -12,9 +12,9 @@ version: '3.8'
 
 services:
   hytale-server:
-    # Use pre-built image from Docker Hub
+    # Use pre-built image from GitHub Container Registry
     # Available tags: latest, rc, dev, edge, X.Y.Z
-    image: everhytale/hytale-server:latest
+    image: ghcr.io/ivanjx/hytale-server:latest
 
     # Or build locally (uncomment below and comment above)
     # build:
