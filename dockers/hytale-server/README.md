@@ -1,6 +1,6 @@
 # 🎮 Hytale Dedicated Server - Docker Image
 
-[![Build](https://github.com/everhytale/dockers/actions/workflows/hytale-server.yml/badge.svg)](https://github.com/everhytale/dockers/actions/workflows/hytale-server.yml)
+[![Build](https://github.com/ivanjx/dockers/actions/workflows/hytale-server.yml/badge.svg)](https://github.com/ivanjx/dockers/actions/workflows/hytale-server.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An optimized, production-ready Docker image for running Hytale dedicated servers.
@@ -15,14 +15,8 @@ All images use SemVer with Hytale version as build metadata:
 
 | Tag | Description | Example |
 |-----|-------------|---------|
-| `latest` | Latest stable release | `ghcr.io/everhytale/hytale-server:latest` |
-| `X.Y.Z+HYTALE_VERSION` | Full version (image + Hytale) | `ghcr.io/everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10` |
-| `HYTALE_VERSION` | Latest image for this Hytale version | `ghcr.io/everhytale/hytale-server:2026.01.15-c04fdfe10` |
-| `X.Y` | Minor version (latest patch) | `ghcr.io/everhytale/hytale-server:1.0` |
-| `X` | Major version (latest minor) | `ghcr.io/everhytale/hytale-server:1` |
-| `rc` | Latest release candidate | `ghcr.io/everhytale/hytale-server:rc` |
-| `dev` | Latest development build | `ghcr.io/everhytale/hytale-server:dev` |
-| `edge` | Latest build from main branch | `ghcr.io/everhytale/hytale-server:edge` |
+| `latest` | Latest stable release | `ghcr.io/ivanjx/hytale-server:latest` |
+| `HYTALE_VERSION` | Hytale version | `ghcr.io/ivanjx/hytale-server:0.5.1` |
 
 ### Automated Builds
 
@@ -53,13 +47,10 @@ The workflow now persists the downloader credentials file between non-PR runs by
 
 ```bash
 # Latest stable release
-docker pull ghcr.io/everhytale/hytale-server:latest
+docker pull ghcr.io/ivanjx/hytale-server:latest
 
-# Specific Hytale version (latest image for that version)
-docker pull ghcr.io/everhytale/hytale-server:2026.01.15-c04fdfe10
-
-# Specific image + Hytale version
-docker pull ghcr.io/everhytale/hytale-server:1.0.0+2026.01.15-c04fdfe10
+# Specific Hytale version (latest image)
+docker pull ghcr.io/ivanjx/hytale-server:0.5.1
 
 # Create data directory
 mkdir -p ./data
@@ -72,14 +63,14 @@ docker run -d \
   -v /etc/machine-id:/etc/machine-id:ro \
   -e MIN_MEMORY=4G \
   -e MAX_MEMORY=8G \
-   ghcr.io/everhytale/hytale-server:latest
+   ghcr.io/ivanjx/hytale-server:latest
 ```
 
 ### Option 2: Using Docker Compose
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/everhytale/dockers.git
+   git clone https://github.com/ivanjx/dockers.git
    cd dockers/dockers/hytale-server
    ```
 
@@ -296,7 +287,7 @@ HYTALE_VERSION=$(cat game-files/.version) docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-context game=./game-files \
   --build-arg HYTALE_VERSION=$HYTALE_VERSION \
-   -t ghcr.io/everhytale/hytale-server:local \
+   -t ghcr.io/ivanjx/hytale-server:local \
   --push .
 ```
 
@@ -402,6 +393,4 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 
 ## 🔗 Links
 
-- **GitHub Container Registry**: [ghcr.io/everhytale/hytale-server](https://github.com/orgs/EverHytale/packages/container/package/hytale-server)
-- **GitHub Repository**: [everhytale/dockers](https://github.com/everhytale/dockers)
-- **Issues**: [GitHub Issues](https://github.com/everhytale/dockers/issues)
+- **GitHub Container Registry**: [ghcr.io/ivanjx/hytale-server](https://github.com/orgs/ivanjx/packages/container/package/hytale-server)

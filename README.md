@@ -17,7 +17,7 @@ All images now use only the Hytale downloader version and `latest`:
 | Tag | Description | Example |
 |-----|-------------|---------|
 | `latest` | Latest available built image | `ghcr.io/ivanjx/hytale-server:latest` |
-| `HYTALE_VERSION` | Hytale version from downloader | `ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10` |
+| `HYTALE_VERSION` | Hytale version from downloader | `ghcr.io/ivanjx/hytale-server:0.5.1` |
 
 ### Automated Builds
 
@@ -32,10 +32,7 @@ The CI/CD pipeline automatically checks for new Hytale versions every 12 hours. 
 docker pull ghcr.io/ivanjx/hytale-server:latest
 
 # Specific Hytale version (latest image)
-docker pull ghcr.io/ivanjx/hytale-server:2026.01.15-c04fdfe10
-
-# Specific image + Hytale version
-docker pull ghcr.io/ivanjx/hytale-server:1.0.0+2026.01.15-c04fdfe10
+docker pull ghcr.io/ivanjx/hytale-server:0.5.1
 
 # Run the server
 docker run -d \
